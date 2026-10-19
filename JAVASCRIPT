@@ -1,0 +1,178 @@
+// Elementos da DOM
+const startScreen = document.getElementById('start-screen');
+const gameScreen = document.getElementById('game-screen');
+const winScreen = document.getElementById('win-screen');
+const startBtn = document.getElementById('start-btn');
+const restartBtn = document.getElementById('restart-btn');
+
+const phaseTitle = document.getElementById('phase-title');
+const crystalCountElem = document.getElementById('crystal-count');
+const gameArena = document.getElementById('game-arena');
+const player = document.getElementById('player');
+const objectiveItem = document.getElementById('objective-item');
+const messageBox = document.getElementById('message-box');
+
+const quizPanel = document.getElementById('quiz-panel');
+const questionText = document.getElementById('question-text');
+const optionsContainer = document.getElementById('options-container');
+
+// Estado do Jogo
+let currentPhase = 1;
+let crystalsCollected = 0;
+let playerX = 50;
+let playerY = 20;
+
+// Dados das Fases baseados no PDF oficial
+const phasesData = {
+    1: {
+        title: "Fase 1: A Crosta Terrestre",
+        arenaClass: "crosta",
+        msg: "Colete 3 cristais de rocha explorando a superfície!",
+        itemSymbol: "💎",
+        targetCount: 3,
+        question: "Qual é a camada mais fina e externa da Terra, onde vivemos?",
+        options: [
+            "Manto Terrestre",
+            "Crosta Terrestre",
+            "Núcleo Externo"
+        ],
+        correct: 1
+    },
+    2: {
+        title: "Fase 2: O Manto",
+        arenaClass: "manto",
+        msg: "Desvie do calor intenso e colete as amostras de magma!",
+        itemSymbol: "🔥",
+        targetCount: 3,
+        question: "Como se chama o material rochoso derretido e pastoso localizado no manto?",
+        options: [
+            "Magma",
+            "Granito Sólido",
+            "Água Fervendo"
+        ],
+        correct: 0
+    },
+    3: {
+        title: "Fase 3: O Núcleo",
+        arenaClass: "nucleo",
+        msg: "Último estágio: Pressão e temperatura extremas!",
+        itemSymbol: "⭐",
+        targetCount: 3,
+        question: "Quais são os dois principais metais que formam o núcleo da Terra?",
+        options: [
+            "Ouro e Prata",
+            "Ferro e Níquel",
+            "Cobre e Alumínio"
+        ],
+        correct: 1
+    }
+};
+
+// Iniciar Jogo
+startBtn.addEventListener('click', () => {
+    startScreen.classList.remove('active');
+    gameScreen.classList.add('active');
+    loadPhase(1);
+});
+
+restartBtn.addEventListener('click', () => {
+    winScreen.classList.remove('active');
+    startScreen.classList.add('active');
+    currentPhase = 1;
+    crystalsCollected = 0;
+});
+
+// Carregar Fase
+function loadPhase(phaseNum) {
+    currentPhase = phaseNum;
+    crystalsCollected = 0;
+    crystalCountElem.textContent = crystalsCollected;
+
+    const data = phasesData[phaseNum];
+    phaseTitle.textContent = data.title;
+    gameArena.className = data.arenaClass;
+    objectiveItem.textContent = data.itemSymbol;
+    messageBox.textContent = data.msg;
+
+    // Reposiciona o item aleatoriamente na arena
+    resetItemPosition();
+}
+
+function resetItemPosition() {
+    const randomX = Math.floor(Math.random() * 70) + 15;
+    const randomY = Math.floor(Math.random() * 50) + 20;
+    objectiveItem.style.left = randomX + '%';
+    objectiveItem.style.top = randomY + '%';
+    objectiveItem.style.display = 'block';
+}
+
+// Movimentação do Jogador pelo Teclado
+window.addEventListener('keydown', (e) => {
+    if (!gameScreen.classList.contains('active') || !quizPanel.classList.contains('hidden')) return;
+
+    const step = 5;
+    if (e.key === 'ArrowRight' && playerX < 90) playerX += step;
+    if (e.key === 'ArrowLeft' && playerX > 5) playerX -= step;
+    if (e.key === 'ArrowUp' && playerY < 80) playerY += step;
+    if (e.key === 'ArrowDown' && playerY > 10) playerY -= step;
+
+    player.style.left = playerX + '%';
+    player.style.bottom = playerY + '%';
+
+    checkItemCollision();
+});
+
+// Checar Coleta do Item
+function checkItemCollision() {
+    // Simulação simplificada de proximidade com o item
+    const itemRect = objectiveItem.getBoundingClientRect();
+    const playerRect = player.getBoundingClientRect();
+
+    const distance = Math.hypot(itemRect.x - playerRect.x, itemRect.y - playerRect.y);
+
+    if (distance < 50) {
+        crystalsCollected++;
+        crystalCountElem.textContent = crystalsCollected;
+        
+        if (crystalsCollected < phasesData[currentPhase].targetCount) {
+            resetItemPosition();
+        } else {
+            objectiveItem.style.display = 'none';
+            triggerQuiz(currentPhase);
+        }
+    }
+}
+
+// Disparar Quiz da Fase
+function triggerQuiz(phaseNum) {
+    const data = phasesData[phaseNum];
+    questionText.textContent = data.question;
+    optionsContainer.innerHTML = '';
+
+    data.options.forEach((optionText, index) => {
+        const btn = document.createElement('button');
+        btn.textContent = optionText;
+        btn.classList.add('option-btn');
+        btn.addEventListener('click', () => handleAnswer(index, data.correct));
+        optionsContainer.appendChild(btn);
+    });
+
+    quizPanel.classList.remove('hidden');
+}
+
+// Validar Resposta do Quiz
+function handleAnswer(selectedIndex, correctIndex) {
+    if (selectedIndex === correctIndex) {
+        quizPanel.classList.add('hidden');
+        
+        if (currentPhase < 3) {
+            alert("Resposta Correta! Avançando para a próxima camada...");
+            loadPhase(currentPhase + 1);
+        } else {
+            gameScreen.classList.remove('active');
+            winScreen.classList.add('active');
+        }
+    } else {
+        alert("Resposta incorreta! Tente novamente.");
+    }
+}

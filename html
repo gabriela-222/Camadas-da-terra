@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missão: Centro da Terra</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- TELA INICIAL -->
+        <div id="start-screen" class="screen active">
+            <h1>🌍 Missão: Centro da Terra</h1>
+            <p>Ajude o explorador a descer da superfície até o núcleo da Terra, passando pelas camadas do planeta e respondendo a desafios científicos!</p>
+            <button id="start-btn">Iniciar Missão</button>
+        </div>
+
+        <!-- TELA DO JOGO -->
+        <div id="game-screen" class="screen">
+            <header id="game-header">
+                <span id="phase-title">Fase 1: Crosta Terrestre</span>
+                <span id="score-board">Cristais: <span id="crystal-count">0</span>/3</span>
+            </header>
+
+            <!-- Cenário de Ação / Simulação da Fase -->
+            <div id="game-arena" class="crosta">
+                <div id="player">🧑‍🚀</div>
+                <div id="objective-item" class="item">💎</div>
+                <div id="message-box">Use as setas do teclado (ou toque) para se mover e coletar os cristais!</div>
+            </div>
+
+            <!-- Painel de Perguntas (Quiz) -->
+            <div id="quiz-panel" class="hidden">
+                <h3 id="question-text">Pergunta da Fase</h3>
+                <div id="options-container">
+                    <!-- Opções injetadas via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA DE VITÓRIA -->
+        <div id="win-screen" class="screen">
+            <h1>🎉 Missão Cumprida!</h1>
+            <p>Parabéns! Você chegou com sucesso ao centro da Terra (Núcleo) e aprendeu tudo sobre as camadas do nosso planeta!</p>
+            <button id="restart-btn">Jogar Novamente</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
